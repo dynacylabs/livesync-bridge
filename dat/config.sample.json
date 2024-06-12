@@ -49,6 +49,7 @@
             },
             "scanOfflineChanges": true,
             "useChokidar": true
+            "usePolling": true
         }
     ]
 }

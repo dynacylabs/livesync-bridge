@@ -103,6 +103,7 @@ The configuration file consists of the following structure.
       },
       "scanOfflineChanges": true,
       "useChokidar":false, // We are using `Deno.watch` now, if you have trouble in Linux, please enable this.
+      "usePolling": false // Optional. Use polling instead of inotify to watch file changes.
     }
   ]
 }

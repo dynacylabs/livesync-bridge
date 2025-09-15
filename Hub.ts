@@ -40,11 +40,11 @@ export class Hub {
                 } else {
                     ret = await peer.put(path, data);
                 }
-                // if (ret) {
-                //     // Logger(`  ${data === false ? "-x->" : "--->"} ${peer.config.name} ${path} `)
-                // } else {
-                //     // Logger(`        ${peer.config.name} ignored ${path} `)
-                // }
+                if (ret) {
+                    // Logger(`  ${data === false ? "-x->" : "--->"} ${peer.config.name} ${path} `)
+                } else {
+                    // Logger(`        ${peer.config.name} ignored ${path} `)
+                }
             }
         }
     }

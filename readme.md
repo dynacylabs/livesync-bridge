@@ -32,7 +32,8 @@ git clone --recursive https://github.com/vrtmrz/livesync-bridge
 3. Simply run like this.
 
 ```bash
-$ deno run -A main.ts
+$ deno install
+$ deno task run
 ```
 
 Note: If you want to scan all storage and databases from the beginning, please run with `--reset`.

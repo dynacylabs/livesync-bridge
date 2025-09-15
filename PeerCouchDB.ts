@@ -1,5 +1,5 @@
 import { DirectFileManipulator, FileInfo, MetaEntry, ReadyEntry } from "./lib/src/API/DirectFileManipulatorV2.ts";
-import { FilePathWithPrefix, LOG_LEVEL_NOTICE, MILSTONE_DOCID, TweakValues } from "./lib/src/common/types.ts";
+import { FilePathWithPrefix, LOG_LEVEL_NOTICE, MILESTONE_DOCID, TweakValues } from "./lib/src/common/types.ts";
 import { PeerCouchDBConf, FileData } from "./types.ts";
 import { decodeBinary } from "./lib/src/string_and_binary/convert.ts";
 import { isPlainText } from "./lib/src/string_and_binary/path.ts";
@@ -92,7 +92,8 @@ export class PeerCouchDB extends Peer {
     }
     async start(): Promise<void> {
         const baseDir = this.toLocalPath("");
-        const w = await this.man.rawGet<Record<string, any>>(MILSTONE_DOCID);
+        await this.man.ready.promise;
+        const w = await this.man.rawGet<Record<string, any>>(MILESTONE_DOCID);
         if (w && "tweak_values" in w) {
             if (this.config.useRemoteTweaks) {
                 const tweaks = Object.values(w["tweak_values"])[0] as TweakValues;
@@ -126,6 +127,11 @@ export class PeerCouchDB extends Peer {
                     this.normalLog(`<--- Remote tweaks changed`);
                 }
             }
+        }
+        if (!w) {
+            this.normalLog(`Remote database looks like empty. fetch from the first.`);
+            this.setSetting("remote-created", "0");
+            return;
         }
         const created = w.created;
         if (this.getSetting("remote-created") !== `${created}`) {
@@ -171,5 +177,6 @@ export class PeerCouchDB extends Peer {
     }
     async stop(): Promise<void> {
         this.man.endWatch();
+        return await Promise.resolve();
     }
 }

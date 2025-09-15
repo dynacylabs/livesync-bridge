@@ -1,18 +1,14 @@
-import { dirname, resolve } from "https://deno.land/std@0.203.0/path/mod.ts";
 import { LOG_LEVEL_INFO, LOG_LEVEL_NOTICE, LOG_LEVEL_VERBOSE } from "./lib/src/common/types.ts";
 import { PeerStorageConf, FileData } from "./types.ts";
 import { Logger } from "./lib/src/common/logger.ts";
 import { delay, getDocData } from "./lib/src/common/utils.ts";
 import { isPlainText } from "./lib/src/string_and_binary/path.ts";
-import { posixParse } from "https://deno.land/std@0.203.0/path/_parse.ts";
-import { relative } from "https://deno.land/std@0.203.0/path/relative.ts";
-import { format } from "https://deno.land/std@0.203.0/path/format.ts";
-import { parse } from "https://deno.land/std@0.203.0/path/parse.ts";
-import { posixFormat } from "https://deno.land/std@0.203.0/path/_format.ts";
+import { parse, format, relative, dirname, resolve } from "@std/path";
+import { format as posixFormat, parse as posixParse } from "@std/path/posix"
 import { scheduleOnceIfDuplicated } from "./lib/src/concurrency/lock.ts";
 import { DispatchFun, Peer } from "./Peer.ts";
 import chokidar from "chokidar";
-import { walk } from 'fs/walk.ts';
+import { walk } from 'fs/walk';
 
 import { scheduleTask } from "./lib/src/concurrency/task.ts";
 
@@ -128,7 +124,7 @@ export class PeerStorage extends Peer {
             return true;
         } catch (ex) {
             this.normalLog("Processor: Error on processing");;
-            this.normalLog(ex);
+            // this.normalLog(ex);
             this.normalLog(JSON.stringify(ex, null, 2));
             return false;
         }
@@ -181,13 +177,14 @@ export class PeerStorage extends Peer {
     async dispatchDeleted(pathSrc: string) {
         const lP = this.toStoragePath(this.toLocalPath("."));
         const path = this.toPosixPath(relative(lP, pathSrc));
-        scheduleOnceIfDuplicated(pathSrc, async () => {
+        await scheduleOnceIfDuplicated(pathSrc, async () => {
             await delay(250);
             if (!await this.isRepeating(path, false)) {
                 this.sendLog(`${path} delete detected`);
                 await this.dispatchToHub(this, this.toGlobalPath(path), false);
             }
         });
+
     }
 
     toPosixPath(path: string) {
@@ -323,12 +320,13 @@ export class PeerStorage extends Peer {
         this.watcher.on("unlink", async (path) => {
             const ePath = this.toPosixPath(relative(this.toLocalPath("."), path));
             this.debugLog(`Unlink detected: ${ePath}`);
-            this.dispatchDeleted(path)
+            await this.dispatchDeleted(path)
         })
     }
     async stop() {
         this.watcher?.close();
         this.watcherDeno?.close();
         this.watcherDeno = undefined;
+        return await Promise.resolve();
     }
 }

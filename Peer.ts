@@ -1,4 +1,4 @@
-import { join as joinPosix } from "https://deno.land/std@0.203.0/path/posix.ts";
+import { join as joinPosix } from "jsr:@std/path/posix";
 import type { FileInfo } from "./lib/src/API/DirectFileManipulatorV2.ts";
 
 import { FilePathWithPrefix, LOG_LEVEL, LOG_LEVEL_DEBUG, LOG_LEVEL_INFO } from "./lib/src/common/types.ts";

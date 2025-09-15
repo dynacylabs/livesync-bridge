@@ -1,4 +1,4 @@
-FROM denoland/deno:1.44.4
+FROM denoland/deno:2.3.1
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ VOLUME /app/data
 
 COPY . .
 
-RUN deno cache main.ts
+RUN deno install
 
-CMD [ "deno", "run", "-A", "main.ts" ]
+CMD [ "deno", "task", "run" ]
 
